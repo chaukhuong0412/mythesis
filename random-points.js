@@ -15,17 +15,24 @@ setInterval(() => {
         });
         res.on('end',() => {
             if (res.statusCode == 200) {
-                const endData = JSON.parse(Buffer.concat(data).toString());
+                let endData;
+                try {
+                    endData = JSON.parse(Buffer.concat(data).toString());
+                } catch (e) {
+                    return;
+                }
                 if (endData.country !== undefined) {
                     const randomPoint = `(${lat},${long},${endData.country});`;
                     fs.appendFile('points.txt', randomPoint, err => {
                         if (err) {
-                            console.error(err);
+                            console.error('Error here:' + err);
                             return
                         }
                     })
                 }
             }
         })
-    })
+    }).on("error", (err) => {
+        console.log("Error: " + err.message);
+      });
 }, 1200);
